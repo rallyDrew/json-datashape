@@ -34,7 +34,7 @@ function datestats(value, sub) {
   if (value)
   {
   value = new Date(value);
-  
+
     //value = new Date(value);
     if (sub.max === null) { sub.max = value;}
     if (sub.min === null) { sub.min = value;}
@@ -98,6 +98,7 @@ function recursionPolice(recurseLevel, maxLevel) {
 
 }
 
+
 function getDataShape(obj, sub, nestlevel) {
 
         nestlevel = recursionPolice(nestlevel, 50); //Throw an exception if we exceed depth of 50
@@ -127,9 +128,8 @@ function getDataShape(obj, sub, nestlevel) {
                 getDataShape(subObj, sub[kName], nestlevel);
             }
 
-
-
             else {
+                if (!sub) { sub = {}; }
 
                 if (sub[kName] === undefined) { sub[kName] = {}; }
 
@@ -184,9 +184,14 @@ function getDataShape(obj, sub, nestlevel) {
         }
 
 
+        
+
+
 
 
 }
+
+
 
 
 module.exports = {
