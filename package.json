@@ -1,6 +1,6 @@
 {
   "name": "json-datashape",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Analyzes JSON data and returns information about its shape and values",
   "main": "datashape.js",
   "scripts": {
