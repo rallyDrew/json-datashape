@@ -1,3 +1,7 @@
+#Ignore sensitive data
+feature.json
+testfeature.js
+
 # Logs
 logs
 *.log
