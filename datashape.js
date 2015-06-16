@@ -37,6 +37,7 @@ function getDataShape(obj, sub, nestlevel) {
           var jsonutil = require('jsonutil');
           dataModel = jsonutil.readFileSync(obj);
           getDataShape(dataModel, sub);
+          return sub;
         }
 
         //Some Recursion Police Work. Don't go beyond 50 nested levels
