@@ -31,7 +31,7 @@ function recursionPolice(recurseLevel, maxLevel) {
 
 function getDataShape(obj, sub, nestlevel) {
 
-        
+
 
         //Some Recursion Police Work. Don't go beyond 50 nested levels
         nestlevel = recursionPolice(nestlevel, 50); //Throw an exception if we exceed depth of 50
@@ -142,6 +142,11 @@ function getDataShape(obj, sub, nestlevel) {
 
 }
 
+function prettyprint(shape) {
+  console.log(util.inspect(shape, {showHidden: false, depth: null}));
+}
+
+
 
 
 
@@ -153,6 +158,7 @@ module.exports = {
   stringstats: stringstats,
   datestats: datestats,
   first: ordinal.first,
-  last:ordinal.last
+  last:ordinal.last,
+  prettyprint: prettyprint
 }
 ;
