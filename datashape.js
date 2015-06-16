@@ -33,9 +33,10 @@ function getDataShape(obj, sub, nestlevel) {
 
 
         //First thing we want to test: Did somebody pass us a filename?
-        if ( _.isString(obj) && !sub && !nestlevel) {
-          var dataModel = require('obj');
-          getDataShape(dataModel);
+        if ( _.isString(obj) && !nestlevel) {
+          console.log("Detected filename.");
+          var dataModel = require(obj);
+          getDataShape(dataModel, sub);
         }
 
         //Some Recursion Police Work. Don't go beyond 50 nested levels
