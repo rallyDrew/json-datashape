@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/rallyDrew/json-datashape",
   "dependencies": {
-    "lodash": "^3.9.3"
+    "lodash": "^3.9.3",
+    "querystring": "^0.2.0",
+    "request": "^2.57.0"
   }
 }
