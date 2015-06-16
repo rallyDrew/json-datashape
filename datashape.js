@@ -34,8 +34,8 @@ function getDataShape(obj, sub, nestlevel) {
 
         //First thing we want to test: Did somebody pass us a filename?
         if ( _.isString(obj) && !nestlevel) {
-          console.log("Detected filename.");
-          var dataModel = require(obj);
+          var jsonutil = require('jsonutil');
+          dataModel = jsonutil.readFileSync(obj);
           getDataShape(dataModel, sub);
         }
 
