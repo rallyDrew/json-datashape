@@ -32,6 +32,11 @@ function recursionPolice(recurseLevel, maxLevel) {
 function getDataShape(obj, sub, nestlevel) {
 
 
+        //First thing we want to test: Did somebody pass us a filename?
+        if ( _.isString(obj) && !sub && !nestlevel) {
+          var dataModel = require('obj');
+          getDataShape(dataModel);
+        }
 
         //Some Recursion Police Work. Don't go beyond 50 nested levels
         nestlevel = recursionPolice(nestlevel, 50); //Throw an exception if we exceed depth of 50
