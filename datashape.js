@@ -1,88 +1,18 @@
 var _ = require('lodash');
 
-function stats(number, sub)
-{
-        number = parseInt(number);
 
-        if (!sub) { sub = {sum:0, count:0, avg:0, max :number, min:number };}
-
-
-        sub.sum = sub.sum + number;
-        sub.count++;
-        sub.avg = (sub.sum / sub.count);
-        if (number > sub.max) { sub.max = number;}
-        if (number < sub.min) { sub.min = number;}
-        return sub;
-
-
-}
-
-function first(value, sub) {
-  if (!sub) { sub = value; }
-  return sub;
-}
-
-function last(value, sub) {
-  sub = value;
-  return sub;
-}
-
-function datestats(value, sub) {
-
-  if (!sub) { sub = {datestats: true, nulls:0, count:0, max :null, min:null };}
-  sub.count++;
-  if (value)
-  {
-  value = new Date(value);
-
-    //value = new Date(value);
-    if (sub.max === null) { sub.max = value;}
-    if (sub.min === null) { sub.min = value;}
-
-    if (value > sub.max) { sub.max = value;}
-    if (value < sub.min) { sub.min = value;}
-
-  }
-
-  else {
-    sub.nulls++;
-  }
+// Helper functions for data shape analysis
+// Probably a better way to load these in, but for now this works quickly
+var stats = require('./functions/stats/numstats');
+var stringstats = require('./functions/stats/stringstats');
+var datestats = require('./functions/stats/datestats');
+var ordinal = require('./functions/ordinal'); // for .first and .last
+var distinct = require('./functions/distinct');
+var objtype = require('./functions/objtype');
+var util = require('util');
 
 
 
-  return sub;
-
-
-
-}
-
-function stringstats(value, sub) {
-  number = value.length || -1;
-  if (!sub) { sub = {stringstats: true, sum:0, nulls:0, count:0, avg:0, max :number, min:number };}
-
-
-  if (number == -1) { sub.nulls++; }
-
-  else {
-    sub.sum = sub.sum + number;
-    sub.count++;
-    sub.avg = (sub.sum / sub.count);
-    if (number > sub.max) { sub.max = number;}
-    if (number < sub.min) { sub.min = number;}
-  }
-
-  return sub;
-}
-
-function objtype(value, sub) {
-     value = ({}).toString.call(value).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
-
-     if (!sub) { sub = {} }; //declare an empty sub
-
-     sub[value] = sub[value] || 0;
-     sub[value]++;
-     return sub;
-}
 
 
 function recursionPolice(recurseLevel, maxLevel) {
@@ -101,34 +31,46 @@ function recursionPolice(recurseLevel, maxLevel) {
 
 function getDataShape(obj, sub, nestlevel) {
 
+        
+
+        //Some Recursion Police Work. Don't go beyond 50 nested levels
         nestlevel = recursionPolice(nestlevel, 50); //Throw an exception if we exceed depth of 50
 
-        var keyValues = Object.keys(obj);
+
+        //Determine keyValues in the object we are looking out
+        var keyValues = _.map(obj, function(v,i) { return i;}); //This works for arrays too.
+        var parentIsArray = _.isArray(obj);
 
 
-
-
-
+        //Iterate through the keys
         for (var ki in keyValues) {
 
-            var kName = keyValues[ki];
+          var kName = keyValues[ki];
 
-            if (_.isArray(obj[kName])) {
-              for (var i in obj[kName]) {
-                getDataShape(obj[kName][i], sub[kName], nestlevel);
-              }
-              //What to do if we encounter an array
-            }
 
-            else if (_.isObject(obj[kName])) {
+          //Do we have nested object?
+          if (_.isObject(obj[kName])) {
                 //what to do if we encounter a sub-object
                 var subObj = obj[kName];
 
-                if (!sub[kName]) { sub[kName] = {};}
-                getDataShape(subObj, sub[kName], nestlevel);
-            }
 
-            else {
+                //Do we need to generate 'sub'?
+                if (parentIsArray) {
+                  if (!sub) { sub = {}; }
+                  getDataShape(subObj, sub, nestlevel);
+
+                }
+                else {
+                  if (!sub[kName]) { sub[kName] = {};}
+                  getDataShape(subObj, sub[kName], nestlevel);
+                }
+
+
+
+          }
+
+          //The object we see isn't a nested object.
+          else {
                 if (!sub) { sub = {}; }
 
                 if (sub[kName] === undefined) { sub[kName] = {}; }
@@ -140,12 +82,21 @@ function getDataShape(obj, sub, nestlevel) {
                     sub[kName]++;
                 }
 
-                else if (sub[kName] == null) {
+                else if (sub[kName] === null) {
                     //no-op
                 }
 
                 else if (_.isFunction(sub[kName])) {
+
+
+
+
+                  try {
                     sub[kName +'_data'] = sub[kName](obj[kName], sub[kName + '_data']);
+                  }
+                  catch (ex) {
+                    console.error(ex);
+                  }
 
                 }
 
@@ -184,7 +135,7 @@ function getDataShape(obj, sub, nestlevel) {
         }
 
 
-        
+
 
 
 
@@ -197,10 +148,11 @@ function getDataShape(obj, sub, nestlevel) {
 module.exports = {
   datashape: getDataShape,
   stats: stats,
+  distinct: distinct,
   objtype: objtype,
   stringstats: stringstats,
   datestats: datestats,
-  first: first,
-  last:last
+  first: ordinal.first,
+  last:ordinal.last
 }
 ;
